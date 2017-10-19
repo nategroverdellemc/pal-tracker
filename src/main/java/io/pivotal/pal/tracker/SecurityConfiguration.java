@@ -19,8 +19,8 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
         //check SECURITY_FORCE_HTTPS
 
         if(useHTTPS){
-            http.authorizeRequests().antMatchers("/**").hasRole("USER").and().formLogin()
-                    .and().requiresChannel().anyRequest().requiresSecure();
+            http.authorizeRequests().antMatchers("/**").hasRole("USER").
+                    and().requiresChannel().anyRequest().requiresSecure();
 
         }
         http
