@@ -1,6 +1,6 @@
+out
 build
 .gradle
 .idea
 *.iml
 ci/variables.yml
-out
