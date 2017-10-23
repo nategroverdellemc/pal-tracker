@@ -1,7 +1,7 @@
 ---
 applications:
-- name: pal-tracker
-  path: build/libs/pal-tracker.jar
-  host: nmg-pivotal-pal-production
+- name: pal-tracker-pipeline
+  path: build/libs/pal-tracker-pipeline.jar
+  host: nmg-pivotal-pal-pipeline-production
   services:
-  - tracker-database
+  - tracker-pipeline-database

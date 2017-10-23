@@ -1,17 +1,17 @@
 ---
 resources:
-- name: pal-tracker
+- name: pal-tracker-pipeline
   type: git
   source:
     uri: {{github-repository}}
-    branch: master
+    branch: {{github-branch}}
     private_key: {{github-private-key}}
 
-- name: pal-tracker-artifacts
+- name: pal-tracker-pipeline-artifacts
   type: s3
   source:
     bucket: {{aws-bucket}}
-    regexp: releases/pal-tracker-(.*).jar
+    regexp: releases/pal-tracker-pipeline-(.*).jar
     access_key_id: {{aws-access-key-id}}
     secret_access_key: {{aws-secret-access-key}}
 
@@ -19,7 +19,7 @@ resources:
   type: semver
   source:
     bucket: {{aws-bucket}}
-    key: pal-tracker/version
+    key: pal-tracker-pipeline/version
     access_key_id: {{aws-access-key-id}}
     secret_access_key: {{aws-secret-access-key}}
 
@@ -44,40 +44,70 @@ resources:
 jobs:
 - name: build
   plan:
-  - get: pal-tracker
+  - get: pal-tracker-pipeline
     trigger: true
   - get: version
     params: {bump: patch}
   - task: build and test
-    file: pal-tracker/ci/build.yml
-  - put: pal-tracker-artifacts
+    file: pal-tracker-pipeline/ci/build.yml
+  - put: pal-tracker-pipeline-artifacts
     params:
-      file: build-output/pal-tracker-*.jar
+      file: build-output/pal-tracker-pipeline-*.jar
   - put: version
     params:
       file: version/number
 
-- name: deploy-review
+- name: migrate-review
   plan:
-  - get: pal-tracker
-  - get: pal-tracker-artifacts
+  - get: pal-tracker-pipeline
+  - get: pal-tracker-pipeline-artifacts
     trigger: true
     passed: [build]
+  - task: migrate review db
+    file: pal-tracker-pipeline/ci/migrate.yml
+    params:
+      environment_variables:
+        flywayUser: {{review-mysql-user}}
+        flywayPassword: {{review-mysql-password}}
+        flywayDbUrl: {{review-mysql-url}}
+        MYSQL_IP: {{review-mysql-ip}}
+
+- name: migrate-production
+  plan:
+  - get: pal-tracker-pipeline
+  - get: pal-tracker-pipeline-artifacts
+    trigger: false
+    passed: [build]
+  - task: migrate prod db
+    file: pal-tracker-pipeline/ci/migrate.yml
+    params:
+      environment_variables:
+        flywayUser: {{prod-mysql-user}}
+        flywayPassword: {{prod-mysql-password}}
+        flywayDbUrl: {{prod-mysql-url}}
+        MYSQL_IP: {{prod-mysql-ip}}
+
+- name: deploy-review
+  plan:
+  - get: pal-tracker-pipeline
+  - get: pal-tracker-pipeline-artifacts
+    trigger: true
+    passed: [migrate-review]
   - put: review-deployment
     params:
-      manifest: pal-tracker/manifest-review.yml
-      path: pal-tracker-artifacts/pal-tracker-*.jar
+      manifest: pal-tracker-pipeline/manifest-review.yml
+      path: pal-tracker-artifacts-pipeline/pal-tracker-*.jar
       environment_variables:
         WELCOME_MESSAGE: "Hello from the review environment"
 
 - name: deploy-production
   plan:
-  - get: pal-tracker
-  - get: pal-tracker-artifacts
+  - get: pal-tracker-pipeline
+  - get: pal-tracker-pipeline-artifacts
     passed: [deploy-review]
   - put: production-deployment
     params:
-      manifest: pal-tracker/manifest-production.yml
-      path: pal-tracker-artifacts/pal-tracker-*.jar
+      manifest: pal-tracker-pipeline/manifest-production.yml
+      path: pal-tracker-pipeline-artifacts/pal-tracker-*.jar
       environment_variables:
         WELCOME_MESSAGE: "Hello from the production environment"
