@@ -35,8 +35,8 @@ run:
     apt-get -y install mariadb-server
     service mysql start
 
-    cd pal-tracker
+    cd pal-tracker-pipeline
 
     mysql -uroot < databases/tracker/tracker.ddl
     ./gradlew -P version=$(cat ../version/number) testMigrate build
-    cp build/libs/pal-tracker-*.jar ../build-output
+    cp build/libs/pal-tracker-pipeline-*.jar ../build-output
