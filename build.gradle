@@ -43,8 +43,8 @@ test.environment([
 
 flyway {
     url = "$System.env.flywayDbUrl"
-    user = "$System.env.flywayUser"
-    password = "$System.env.flywayPassword"
+    //user = "$System.env.flywayUser"
+    //password = "$System.env.flywayPassword"
     locations = ["filesystem:databases/tracker/migrations"]
 }
 
