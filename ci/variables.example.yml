@@ -5,6 +5,12 @@ cf-org: CF_ORG
 aws-access-key-id: <YOUR_ACCESS_KEY>
 aws-secret-access-key: <YOUR_SECRET_KEY>
 aws-bucket: <YOUR_AWS_S3_BUCKET>
+review-mysql-user: <MYSQL_USER>
+review-mysql-password: <MYSQL_PASSWORD>
+review-mysql-user: <MYSQL_URL>
+prod-mysql-user: <MYSQL_USER>
+prod-mysql-password: <MYSQL_PASSWORD>
+prod-mysql-user: <MYSQL_URL>
 github-repository: git@github.com:GITHUB_USERNAME/pal-tracker.git
 github-private-key: |
   -----BEGIN RSA PRIVATE KEY-----

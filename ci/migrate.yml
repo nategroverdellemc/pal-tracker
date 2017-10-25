@@ -1,0 +1,23 @@
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: openjdk
+    tag: '8-jdk'
+
+inputs:
+  - name: pal-tracker
+  - name: version
+
+outputs:
+  - name: migrate-output
+
+run:
+  path: bash
+  args:
+  - -exc
+  - |
+    cd pal-tracker
+    cf ssh -N -L TUNNEL APPNAME &
+    ./gradlew -P flywayMigrate -i
