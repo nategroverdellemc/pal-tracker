@@ -8,7 +8,6 @@ image_resource:
 
 inputs:
   - name: pal-tracker-pipeline
-  - name: version
 
 outputs:
   - name: migrate-output

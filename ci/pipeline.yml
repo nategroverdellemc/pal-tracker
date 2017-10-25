@@ -60,8 +60,6 @@ jobs:
 - name: migrate-review
   plan:
   - get: pal-tracker-pipeline
-  - get: version
-    params: {bump: patch}
   - get: pal-tracker-pipeline-artifacts
     trigger: true
     passed: [build]
